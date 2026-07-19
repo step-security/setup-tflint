@@ -1,3 +1,4 @@
+import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
@@ -11,7 +12,13 @@ import { BIN_SUFFIX, CLI_PATH_ENV } from '../wrapper/lib/tflint-protocol.js';
 
 import restoreCache from './cache-restore.js';
 import { downloadCLI } from './installer.js';
-import { mapArch, mapOS, normalizeVersion, resolveReleaseTarget } from './release-target.js';
+import {
+  mapArch,
+  mapOS,
+  normalizeVersion,
+  resolveReleaseTarget,
+  resolveRequestedVersion,
+} from './release-target.js';
 
 function getOctokit() {
   return new Octokit({
@@ -53,6 +60,27 @@ async function getInstalledVersion() {
   }
 }
 
+/**
+ * Read the requested TFLint version from the action inputs. The version-file
+ * parsing and input-precedence rules live in `resolveRequestedVersion`
+ * (release-target.js) so they can be unit tested; this wrapper only supplies
+ * the Actions-runtime concerns (inputs, path resolution, filesystem, logging).
+ * @returns {string} - The requested version ("latest", empty, or explicit/file)
+ */
+function getRequestedVersion() {
+  return resolveRequestedVersion({
+    inputVersion: core.getInput('tflint_version'),
+    versionFile: core.getInput('tflint_version_file'),
+    // The path comes from a trusted workflow input, not from untrusted runtime data.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fileExists: (file) => fs.existsSync(path.resolve(file)),
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    readFile: (file) => fs.readFileSync(path.resolve(file), 'utf8'),
+    warn: core.warning,
+    info: core.info,
+  });
+}
+
 async function installWrapper(pathToCLI) {
   // Move the original tflint binary to a new location
   await io.mv(path.join(pathToCLI, 'tflint'), path.join(pathToCLI, BIN_SUFFIX));
@@ -76,7 +104,7 @@ async function run() {
   try {
     await restoreCache();
 
-    const inputVersion = core.getInput('tflint_version');
+    const inputVersion = getRequestedVersion();
     const checksums = core.getMultilineInput('checksums');
     const wrapper = core.getInput('tflint_wrapper') === 'true';
     const platform = mapOS(os.platform());
