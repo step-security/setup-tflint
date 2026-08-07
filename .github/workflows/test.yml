@@ -165,6 +165,38 @@ jobs:
           checksums: bb0a3a6043ea1bcd221fc95d49bac831bb511eb31946ca6a4050983e9e584578
       - run: tflint -v
 
+  integration-version-file:
+    runs-on: ubuntu-latest
+    name: 'Integration test: version file'
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Write version file
+        run: |
+          cat > .tool-versions <<'EOF'
+          terraform 1.9.0
+          tflint 0.52.0
+          EOF
+      - name: Use Action
+        id: setup-tflint
+        uses: ./
+        with:
+          tflint_version_file: .tool-versions
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate
+        run: tflint -v | grep 0.52.0
+      - name: Verify version output
+        run: |
+          if [[ "${{ steps.setup-tflint.outputs.tflint-version }}" != "0.52.0" ]]; then
+            echo "Expected version output '0.52.0', got '${{ steps.setup-tflint.outputs.tflint-version }}'"
+            exit 1
+          fi
+
   integration-matchers:
     name: 'Integration test: matchers (tflint_version: ${{ matrix.tflint_version }})'
     runs-on: ubuntu-latest

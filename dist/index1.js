@@ -27877,14 +27877,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 8029:
-/***/ ((module) => {
-
-module.exports = eval("require")("./tflint-protocol.js");
-
-
-/***/ }),
-
 /***/ 2613:
 /***/ ((module) => {
 
@@ -31087,12 +31079,20 @@ class OutputListener {
 
 /* harmony default export */ const output_listener = (OutputListener);
 
-// EXTERNAL MODULE: ./node_modules/@vercel/ncc/dist/ncc/@@notfound.js?./tflint-protocol.js
-var _notfoundtflint_protocol = __nccwpck_require__(8029);
+;// CONCATENATED MODULE: ./wrapper/lib/tflint-protocol.js
+
+
+const BIN_SUFFIX = 'tflint-bin';
+const CLI_PATH_ENV = 'TFLINT_CLI_PATH';
+
+function resolveBinPath(dir) {
+  return [dir, BIN_SUFFIX].join(external_path_namespaceObject.sep);
+}
+
 ;// CONCATENATED MODULE: ./wrapper/lib/tflint-bin.js
 
 
-/* harmony default export */ const tflint_bin = ((0,_notfoundtflint_protocol.resolveBinPath)(process.env[_notfoundtflint_protocol.CLI_PATH_ENV]));
+/* harmony default export */ const tflint_bin = (resolveBinPath(process.env[CLI_PATH_ENV]));
 
 ;// CONCATENATED MODULE: ./wrapper/tflint.js
 

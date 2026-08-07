@@ -30,7 +30,7 @@ The version may be written with or without a leading `v`.
 This input is used only when `tflint_version` is unset or `latest`. If `tflint_version` is set to an explicit version, it takes precedence and `tflint_version_file` is ignored.
 
 ```yaml
-- uses: terraform-linters/setup-tflint@v6
+- uses: step-security/setup-tflint@v6
   with:
     tflint_version_file: .tool-versions
 ```
