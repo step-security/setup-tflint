@@ -1,11 +1,8 @@
-import babelParser from '@babel/eslint-parser';
-import { fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import _import from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import jest from 'eslint-plugin-jest';
 import jsdoc from 'eslint-plugin-jsdoc';
-import promise from 'eslint-plugin-promise';
 import security from 'eslint-plugin-security';
 import globals from 'globals';
 
@@ -24,9 +21,8 @@ export default [
     plugins: {
       jsdoc,
       jest,
-      promise,
       security,
-      import: fixupPluginRules(_import),
+      'import-x': importPlugin,
     },
 
     languageOptions: {
@@ -34,17 +30,15 @@ export default [
         ...globals.node,
       },
 
-      parser: babelParser,
       sourceType: 'module',
 
       parserOptions: {
-        requireConfigFile: false,
         sourceType: 'module',
       },
     },
 
     settings: {
-      'import/resolver': {
+      'import-x/resolver': {
         node: {
           extensions: ['.js', '.ts'],
         },
@@ -148,9 +142,9 @@ export default [
       'no-empty-function': 'error',
       'valid-jsdoc': 'off',
       yoda: 'error',
-      'import/no-unresolved': 'off',
+      'import-x/no-unresolved': 'off',
 
-      'import/order': [
+      'import-x/order': [
         'error',
         {
           'newlines-between': 'always',
@@ -180,18 +174,6 @@ export default [
       'jsdoc/require-returns-description': 'off',
       'jsdoc/require-returns-type': 'error',
       'jsdoc/valid-types': 'error',
-      'promise/always-return': 'error',
-      'promise/always-catch': 'off',
-
-      'promise/catch-or-return': [
-        'error',
-        {
-          allowThen: true,
-        },
-      ],
-
-      'promise/no-native': 'off',
-      'promise/param-names': 'error',
       'security/detect-buffer-noassert': 'error',
       'security/detect-child-process': 'error',
       'security/detect-disable-mustache-escape': 'error',
